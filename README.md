@@ -17,7 +17,7 @@ This repository is the public description of the system. The compose files and s
 | **Data store** | Postgres (with `pgvector`) for the agent and a service changelog; SQLite for the lighter services |
 | **Alerts** | Telegram bot for cron-job success/failure and ad-hoc notifications |
 | **Backups** | Weekly tarballs of every compose file and per-service config to a separate volume |
-| **External access** | Tailscale; no service is exposed to the public internet |
+| **External access** | Public services published behind Cloudflare with per-application auth; the router and admin surfaces stay on the LAN |
 | **Operator** | One — me. Single-tenant. Single-operator. |
 | **Uptime visibility** | Uptime Kuma for service-level health; Telegram bot for cron-job status |
 | **Code in this repo** | None yet — see [What's not in this repo](#whats-deliberately-not-in-this-repo-yet) |
@@ -173,7 +173,7 @@ A small set of rules that have survived the year of operation:
 - **Vault-staging pattern for the agent.** Documents that the agent processes land in a staging directory first, get reviewed, and only then move to the canonical vault. Stops a hallucinating agent from polluting the system of record.
 - **"Ask before periodic" rule.** Any new cron job, watcher, webhook poll, or scheduled task requires explicit approval before it gets added. On-demand by default. This rule exists because I once spent a week tracking down a problem caused by a "small" scheduled job I'd forgotten about.
 - **Watchtower with deliberate trade-offs.** Image updates run on a schedule. The convenience is real and the risk is also real — occasionally a new image breaks something silently. The mitigation is the Uptime Kuma channel plus the changelog, so a regression caused by an automatic update is loud rather than quiet. Critical services can be opted out of Watchtower individually when the risk does not pencil.
-- **No service is exposed to the open internet.** Access is via Tailscale or the LAN. The convenience cost of typing a Tailscale-routed URL is lower than the operations cost of fronting a public endpoint properly.
+- **Public services sit behind Cloudflare with per-application auth.** The router itself and the admin surfaces stay on the LAN. Anything public has its own login screen; nothing is reachable without one.
 
 ---
 
